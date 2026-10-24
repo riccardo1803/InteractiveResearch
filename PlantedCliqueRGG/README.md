@@ -1,0 +1,1 @@
+# Planted clique in RGG
