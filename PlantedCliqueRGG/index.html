@@ -1148,6 +1148,40 @@ body {padding-bottom:calc(var(--ir-bottom-height) + env(safe-area-inset-bottom,0
  .ir-numbered-row{grid-template-columns:27px minmax(0,1fr) 34px;}
  .ir-numbered-row .ir-equation-number{font-size:11px}
 }
+
+/* Top-of-page reading-mode invitation; colors follow both reading styles and all appearances. */
+.ir-mode-welcome{
+ display:flex;align-items:center;justify-content:space-between;gap:28px;
+ margin-top:24px;padding:19px 22px;
+ background:var(--ir-surface);color:var(--ir-ink);
+ border:1px solid var(--ir-border);border-left:4px solid var(--ir-primary);
+ border-radius:15px;box-shadow:var(--ir-shadow)
+}
+.ir-mode-welcome-copy{flex:1;min-width:0}
+.ir-mode-welcome-eyebrow{font-size:10px;letter-spacing:.13em;font-weight:800;color:var(--ir-primary);margin-bottom:5px}
+.ir-mode-welcome h2{font-family:inherit;font-size:19px;line-height:1.24;letter-spacing:-.022em;margin:0 0 5px;color:var(--ir-ink)}
+.ir-mode-welcome p{font-size:12.5px;line-height:1.56;margin:0;color:var(--ir-muted);max-width:710px}
+.ir-mode-welcome p strong{color:var(--ir-ink);font-weight:750}
+.ir-mode-welcome-actions{display:flex;gap:7px;flex:none}
+.ir-mode-welcome-actions button{
+ border:1px solid var(--ir-border);border-radius:9px;background:var(--ir-surface-2);
+ color:var(--ir-ink);font-family:inherit;font-weight:750;font-size:12px;
+ padding:10px 18px;min-width:100px;cursor:pointer;transition:background .2s,color .2s,border-color .2s
+}
+.ir-mode-welcome-actions button[aria-pressed="true"]{
+ background:var(--ir-primary);color:var(--ir-on-primary);border-color:var(--ir-primary)
+}
+.ir-mode-welcome-actions button:hover:not([aria-pressed="true"]){border-color:var(--ir-primary);color:var(--ir-primary)}
+.ir-mode-welcome-actions button:focus-visible{outline:3px solid var(--ir-primary);outline-offset:3px}
+.ir-mode-welcome+.hero{padding-top:38px}
+@media(max-width:720px){
+ .ir-mode-welcome{flex-direction:column;align-items:stretch;gap:14px;margin-top:15px;padding:16px}
+ .ir-mode-welcome h2{font-size:18px}
+ .ir-mode-welcome p{font-size:12px}
+ .ir-mode-welcome-actions{width:100%}
+ .ir-mode-welcome-actions button{flex:1;min-width:0}
+ .ir-mode-welcome+.hero{padding-top:28px}
+}
 </style></head>
 <body>
 <header class="shell topbar">
@@ -1155,6 +1189,18 @@ body {padding-bottom:calc(var(--ir-bottom-height) + env(safe-area-inset-bottom,0
 
 </header>
 <main class="shell" id="top">
+<section class="ir-mode-welcome" aria-labelledby="ir-mode-welcome-title">
+  <div class="ir-mode-welcome-copy">
+    <div class="ir-mode-welcome-eyebrow">TWO WAYS TO EXPLORE</div>
+    <h2 id="ir-mode-welcome-title">Choose your reading mode</h2>
+    <p><strong>Simple</strong> offers a guided, visual introduction. <strong>Research</strong> presents mathematical definitions, algorithms and theoretical results. Switch at any time.</p>
+  </div>
+  <div class="ir-mode-welcome-actions" role="group" aria-label="Choose your reading mode">
+    <button type="button" data-ir-select-mode="simple" aria-pressed="true">Simple</button>
+    <button type="button" data-ir-select-mode="research" aria-pressed="false">Research</button>
+  </div>
+</section>
+
 <section aria-labelledby="page-title" class="hero">
 <div><div class="eyebrow">RESEARCH MADE INTERACTIVE · CHAPTER 01</div><h1 class="ir-simple-content">The network has a <em>hidden group.</em></h1><h1 class="ir-research-content ir-replacement"><em>Planted clique</em> recovery in random geometric graphs.</h1><p class="ir-simple-content">Some networks are shaped by hidden features. What happens when a coordinated group secretly adds connections? Explore the problem, test yourself, and discover two approaches to detection.</p><p class="ir-research-content ir-replacement">Exact recovery guarantees for vertex-degree and common-neighbours estimators in hard random geometric graphs. Interactive implementations and finite-size experiments complement the theorems.</p></div>
 <aside class="hero-card ir-simple-content"><div class="mini-label">Case file</div><strong>From a hidden pattern to a detection strategy.</strong><p>Learn the model, solve the mystery, and investigate how the arrangement of connections reveals hidden patterns.</p><div class="pills"><span class="pill">15–20 min exploration</span><span class="pill">No math required</span><span class="pill">Real random graphs</span></div></aside><aside class="hero-card ir-research-content"><div class="mini-label">ARTICLE · JOURNAL OF COMPLEX NETWORKS</div><strong>Planted clique recovery in random geometric graphs</strong><p>Avrachenkov · Bobu · Litvak · Michielan (2026)</p><div class="pills"><span class="pill">3 main theorems</span><span class="pill">2 estimators</span><span class="pill">Exact recovery</span></div><p style="margin-top:12px"><a class="ir-ref" href="https://doi.org/10.1093/comnet/cnag025" rel="noopener noreferrer" target="_blank">Paper · full article ↗</a></p></aside>
@@ -2768,8 +2814,10 @@ body {padding-bottom:calc(var(--ir-bottom-height) + env(safe-area-inset-bottom,0
     modes.forEach(function(m){var el=document.getElementById('ir-mode-'+m);if(!el)return;var yes=mode===m;el.setAttribute('aria-pressed',String(yes));el.classList.toggle('current',yes);});
     appearances.forEach(function(a){var el=document.getElementById('ir-theme-'+a);if(!el)return;el.setAttribute('aria-pressed',String(appearance===a));});
     var note=document.getElementById('ir-mode-description');if(note)note.textContent=mode==='research'?'Mathematical model, algorithms and theorems.':'Guided, visual exploration.';
+    document.querySelectorAll('[data-ir-select-mode]').forEach(function(el){el.setAttribute('aria-pressed',String(el.dataset.irSelectMode===mode));});
   }
   modes.forEach(function(m){var el=document.getElementById('ir-mode-'+m);if(el)el.addEventListener('click',function(){mode=m;store('ir-reading-mode',m);update();});});
+  document.querySelectorAll('[data-ir-select-mode]').forEach(function(el){el.addEventListener('click',function(){var original=document.getElementById('ir-mode-'+el.dataset.irSelectMode);if(original)original.click();});});
   appearances.forEach(function(a){var el=document.getElementById('ir-theme-'+a);if(el)el.addEventListener('click',function(){appearance=a;store('ir-appearance',a);update();});});
   if(system){if(system.addEventListener)system.addEventListener('change',function(){if(appearance==='system')update();});else if(system.addListener)system.addListener(function(){if(appearance==='system')update();});}
   update();
